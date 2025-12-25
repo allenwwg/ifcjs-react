@@ -7,7 +7,9 @@ export default defineConfig({
   root: "./src",
   publicDir: "../public",
   server: {
-    open: true,
+  	port: 6500,
+	host: '0,0,0,0',
+  	open: true,
   },
   plugins: [react()],
   build: {
