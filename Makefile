@@ -35,7 +35,7 @@ build/development/watch:
 	$(MAKE) build/development VITE_OPTS='--watch --sourcemap'
 
 build/serve:
-	export $$(cat .env.development) > /dev/null; yarn run vite serve --host 0.0.0.0
+	export $$(cat .env.development) > /dev/null; yarn run vite serve --host 0.0.0.0 --no-open
 
 fmt:
 ifneq (,$(CI))

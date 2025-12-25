@@ -24,19 +24,9 @@ export const HelpDialog: React.FC<{
         <DialogContent>
           <List dense>
             <ListItem>
-              <ListItemText primary="right-click" secondary="Create a Plan" />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="double-click" secondary="Pick an Item" />
+              <ListItemText primary="IFC Viewer" secondary="Version: 1.0" />
             </ListItem>
           </List>
-          <Link
-            href="https://github.com/ktaroabobon/ifcjs-react"
-            underline="hover"
-            target="_blank"
-          >
-            Join us on GitHub
-          </Link>
           <GitHub />
         </DialogContent>
       </Dialog>

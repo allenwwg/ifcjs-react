@@ -49,7 +49,7 @@ export const Navibar: React.FC<{
             <MenuIcon />
           </IconButton>
           <Typography variant={"h6"} component={"div"} noWrap marginX={"auto"}>
-            IFC.js in React!!!
+            IFC Viewer
           </Typography>
         </Toolbar>
       </AppBar>

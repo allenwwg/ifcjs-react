@@ -126,21 +126,6 @@ export const DrawerContent: React.FC<{
           </ListItemIcon>
           <ListItemText primary={"Clipping Planes"} />
         </ListItemButton>
-        <ListItemButton
-          key={"check"}
-          onClick={() => props.setIsConfirmationDialogOpen(true)}
-        >
-          <ListItemIcon>
-            <BugReport />
-          </ListItemIcon>
-          <ListItemText primary={"Building Confirmation"} />
-        </ListItemButton>
-        <ListItemButton key={"preferences"}>
-          <ListItemIcon>
-            <Settings />
-          </ListItemIcon>
-          <ListItemText primary={"Preferences"} />
-        </ListItemButton>
       </List>
       <Divider />
       <List>
