@@ -1,5 +1,5 @@
 import React from "react";
-import { IconButton, Toolbar, Typography } from "@mui/material";
+import { IconButton, Toolbar } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
@@ -48,9 +48,6 @@ export const Navibar: React.FC<{
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant={"h6"} component={"div"} noWrap marginX={"auto"}>
-            IFC Viewer
-          </Typography>
         </Toolbar>
       </AppBar>
     </>

@@ -3,6 +3,7 @@ import { styled, Theme, CSSObject } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   Divider,
   IconButton,
@@ -45,8 +46,7 @@ export const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
+  minHeight: theme.spacing(6),
 }));
 
 const Drawer = styled(MuiDrawer, {
@@ -78,26 +78,54 @@ export const DrawerContent: React.FC<{
   const [isClippingPaneSelected, setClippingPaneSelected] = useState(false);
 
   const toggleClippingPlanes = () => {
-    if (props.viewer) {
-      props.viewer.clipper.toggle();
-      if (props.viewer.clipper.active) {
-        setClippingPaneSelected(true);
-      } else {
-        setClippingPaneSelected(false);
+    const v: any = props.viewer as any;
+    if (!v) return;
+    try {
+      if (typeof v.toggleClippingPlanes === 'function') {
+        // Preferred API in web-ifc-viewer 1.0.210
+        v.toggleClippingPlanes();
+        const active = !!(v.clipper && v.clipper.active);
+        setClippingPaneSelected(active);
+      } else if (v.clipper) {
+        // Fallback: toggle internal active flag without forcing a plane creation
+        const nowActive = !v.clipper.active;
+        v.clipper.active = nowActive;
+        if (!nowActive) {
+          // When turning off, clear planes
+          if (typeof v.clipper.deleteAllPlanes === 'function') {
+            v.clipper.deleteAllPlanes();
+          }
+        }
+        setClippingPaneSelected(nowActive);
       }
+    } catch (e) {
+      console.warn('Clipping toggle error', e);
     }
   };
+
+  // Sync selected state with the actual viewer clipper state on mount/update
+  React.useEffect(() => {
+    if (props.viewer && (props.viewer as any).clipper) {
+      setClippingPaneSelected(!!(props.viewer as any).clipper.active);
+    }
+  }, [props.viewer]);
 
   return (
     <Drawer variant="permanent" open={props.isDrawerOpen}>
       <DrawerHeader>
-        <IconButton onClick={() => props.setDrawerOpen(false)}>
-          {props.theme.direction === "rtl" ? (
-            <ChevronRightIcon />
-          ) : (
-            <ChevronLeftIcon />
-          )}
-        </IconButton>
+        {props.isDrawerOpen ? (
+          <IconButton onClick={() => props.setDrawerOpen(false)}>
+            {props.theme.direction === "rtl" ? (
+              <ChevronRightIcon />
+            ) : (
+              <ChevronLeftIcon />
+            )}
+          </IconButton>
+        ) : (
+          <IconButton onClick={() => props.setDrawerOpen(true)}>
+            <MenuIcon />
+          </IconButton>
+        )}
       </DrawerHeader>
       <Divider />
       <List>

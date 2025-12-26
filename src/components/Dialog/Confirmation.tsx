@@ -11,8 +11,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { IfcViewerAPI } from "web-ifc-viewer";
-import { Buffer } from "buffer";
-import pako from "pako";
+// Remove buffer/pako by using native CompressionStream and base64 helpers
 
 import { API_HOST } from "../../../env/Index";
 
@@ -29,11 +28,29 @@ const CheckBuilding = async (ifcViewer: IfcViewerAPI | undefined) => {
 
   const data = await ifcViewer.IFC.loader.ifcManager.ifcAPI.ExportFileAsIFC(0);
 
-  // valueを圧縮する
-  const blob = new Blob([data], { type: "text/plain" });
-  const text = await blob.text();
-  const value = pako.gzip(text, { level: 9 });
-  const valueBase64 = Buffer.from(value).toString("base64");
+  // 圧縮: Use CompressionStream('gzip') when available, else send raw
+  async function gzipUint8(input) {
+    if (typeof CompressionStream !== "undefined") {
+      const cs = new CompressionStream("gzip");
+      const readable = new Response(new Blob([input]).stream().pipeThrough(cs)).arrayBuffer();
+      const buf = await readable;
+      return new Uint8Array(buf);
+    }
+    // Fallback: return original data (no gzip)
+    return input instanceof Uint8Array ? input : new Uint8Array(input);
+  }
+
+  function toBase64(u8) {
+    let binary = "";
+    const chunk = 0x8000;
+    for (let i = 0; i < u8.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, u8.subarray(i, i + chunk) as any);
+    }
+    return btoa(binary);
+  }
+
+  const gz = await gzipUint8(data);
+  const valueBase64 = toBase64(gz);
 
   //  圧縮したvalueをAPIに投げる
   const response = await fetch(API_HOST + "/law/21-1", {
@@ -43,7 +60,7 @@ const CheckBuilding = async (ifcViewer: IfcViewerAPI | undefined) => {
     },
     body: JSON.stringify({
       ifc: valueBase64,
-      zipped: true,
+      zipped: typeof CompressionStream !== "undefined",
       metadata: {
         name: "test",
         description: "test",
